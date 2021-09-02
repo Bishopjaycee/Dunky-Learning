@@ -1,24 +1,44 @@
-import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-
-import useCachedResources from './hooks/useCachedResources';
-import useColorScheme from './hooks/useColorScheme';
-import Navigation from './navigation';
+import React from "react";
+import { View, Dimensions, LogBox } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import Apploading from "expo-app-loading";
+import StackNavigation from "./src/navigation/stackNavigation";
+import NetInfo from "@react-native-community/netinfo";
+import { useEffect } from "react";
 
 export default function App() {
-  const isLoadingComplete = useCachedResources();
-  const colorScheme = useColorScheme();
+  LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
+  let [fontsLoaded, error] = useFonts({
+    Inter: require("./src/assets/fonts/inter.ttf"),
+  });
+  useEffect(() => {
+    // Subscribe
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      console.log("Connection type", state.type);
+      console.log("Is connected?", state.isConnected);
+    });
 
-  if (!isLoadingComplete) {
-    return null;
+    // Unsubscribe
+    return () => unsubscribe();
+  }, []);
+  if (!fontsLoaded) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          width: Dimensions.get("window").width,
+          height: Dimensions.get("window").height,
+        }}
+      >
+        <Apploading />
+      </View>
+    );
   } else {
     return (
-      <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
-      </SafeAreaProvider>
+      <NavigationContainer>
+        <StackNavigation />
+      </NavigationContainer>
     );
   }
 }
