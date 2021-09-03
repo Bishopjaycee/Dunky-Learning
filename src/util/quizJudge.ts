@@ -18,6 +18,6 @@ export default function quizJudge({ answers }: QuizJudgeProps): QuizJudge {
   const wrong = filteredAnswer.filter((item) => item == false).length;
   const points = 33.33 * correct;
 
-  console.log({ wrong, correct, dunkEarned: points }, "quiz judge");
+  // console.log({ wrong, correct, dunkEarned: points }, "quiz judge");
   return { wrong, correct, dunkEarned: points };
 }

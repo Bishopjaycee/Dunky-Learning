@@ -30,7 +30,7 @@ const QuizScreen: FC<QuizScreenProps> = ({ navigation, route }) => {
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [questions, setQuestions] = useState<QuestionModel[]>([]);
-  const [curIndex, setCurIndex] = useState(1000);
+  const [curIndex, setCurIndex] = useState(1);
   const [timer, setTimer] = useState(20);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [nextClk, setNext] = useState(false); //tells auto indexer to check if user already moved to the next question
@@ -39,7 +39,6 @@ const QuizScreen: FC<QuizScreenProps> = ({ navigation, route }) => {
     getQuestions({ subject: subjectTitle.toLowerCase(), level: 0 }).then(
       (data) => {
         setQuestions(data);
-        setCurIndex(1);
         setIsLoaded(true);
       }
     );
@@ -67,45 +66,50 @@ const QuizScreen: FC<QuizScreenProps> = ({ navigation, route }) => {
     [answers]
   );
   const report = () => {
-    quizJudge({ answers });
-    navigation.navigate("quiz-report");
+    const { correct, wrong, dunkEarned } = quizJudge({ answers });
+    navigation.navigate("quiz-report", { correct, wrong, dunkEarned });
   };
   const next = () => {
     if (curIndex < questions.length) {
       setCurIndex(curIndex + 1);
       setNext(!nextClk);
     } else {
-      console.log(curIndex);
+      console.log(curIndex, "repoter");
       report();
     }
   };
 
   const prev = () => setCurIndex(curIndex - 1);
 
+  /**
+   * The useEffect below is a little messy than expected.
+   * Dodge some flying bug if you can. LOL
+   */
   useEffect(() => {
     let unsubscribeTimer: any = null;
 
     if (questions.length <= 0) return;
     if (curIndex > questions.length) return;
-    if (curIndex <= questions.length) {
+    if (curIndex < questions.length || curIndex == questions.length) {
+      //What logic operations can I do here to stop timer after the last index?
       unsubscribeTimer = setInterval(() => setTimer(timer - 1), 1000);
     }
 
-    if (timer <= 0 && curIndex < questions.length) {
-      if (curIndex > questions.length) {
-        clearInterval(unsubscribeTimer);
-        return;
-      }
+    if (timer <= 0 && curIndex <= questions.length) {
       if (!nextClk) next();
       setNext(!nextClk);
-      setTimer(7);
+      setTimer(curIndex >= questions.length ? 0 : 20);
     }
-
+    if (timer <= 0 && curIndex == questions.length) {
+      clearInterval(unsubscribeTimer);
+      report();
+      return;
+    }
     return () => clearInterval(unsubscribeTimer);
-  }, [timer]);
+  }, [timer, isLoaded]);
 
   console.log(timer, "reloaded");
-  if (isLoaded && questions.length <= 0) {
+  if ((isLoaded && questions.length <= 0) || questions == undefined) {
     return (
       <>
         <Text mt={"20%"} p={"4"} color="primary.600" textAlign="center">
@@ -116,7 +120,7 @@ const QuizScreen: FC<QuizScreenProps> = ({ navigation, route }) => {
           textAlign="center"
           textDecoration="underline"
         >
-          Go Home
+          Retry
         </Text>
       </>
     );

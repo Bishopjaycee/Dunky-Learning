@@ -6,9 +6,12 @@ import { useUser } from "./../util/use-user";
 
 interface QuizReportProps {
   navigation: any;
+  route: any;
 }
 
-const QuizReport: FC<QuizReportProps> = ({ navigation }) => {
+const QuizReport: FC<QuizReportProps> = ({ navigation, route }) => {
+  const { correct, wrong, dunkEarned } = route.params;
+
   // const [isLoaded, setIsLoaded] = useState(false);
   const { userRole } = useUser();
 
@@ -18,7 +21,7 @@ const QuizReport: FC<QuizReportProps> = ({ navigation }) => {
   //   });
   //   return () => unsubscribed;
   // }, [navigation]);
-
+  console.log(correct, wrong, dunkEarned, "from report");
   return userRole ? (
     <VStack alignItems="center" py={4} bg="white" px={10} pb={8} h="100%">
       <Text fontWeight="bold" mt={8} fontSize={26}>
