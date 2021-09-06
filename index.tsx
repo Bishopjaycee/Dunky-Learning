@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-// import { useNetInfo } from "@react-native-community/netinfo";
+import { NavigationContainer } from "@react-navigation/native";
 import { extendTheme, NativeBaseProvider } from "native-base";
 import { registerRootComponent } from "expo";
-import App from "./App";
+// import App from "./App";
 import { enableScreens } from "react-native-screens";
+import StackNavigation from "./src/navigation/stackNavigation";
 
 const newColorTheme = {
   brand: {
@@ -42,7 +43,9 @@ enableScreens();
 export default function Index() {
   return (
     <NativeBaseProvider theme={theme}>
-      <App />
+      <NavigationContainer>
+        <StackNavigation />
+      </NavigationContainer>
     </NativeBaseProvider>
   );
 }

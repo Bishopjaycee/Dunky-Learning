@@ -1,14 +1,12 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-// import HomeScreen from "../screens/HomeScreen";
 import { Ionicons } from "@expo/vector-icons";
-import CompetitionStack from "./competitionStack";
 import SettingStack from "./settingStack";
 import SubjectStack from "./subjectsStack";
-// import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { enableScreens } from "react-native-screens";
 
 import HomeStack from "./studentHomeStack";
+import CompetitionScreen from "./../screens/CompetitionScreen";
 
 const Tab = createBottomTabNavigator(); //createMaterialBottomTabNavigator();
 
@@ -65,7 +63,7 @@ export default function StudentTap() {
       />
       <Tab.Screen
         name="competitionScreen"
-        component={CompetitionStack}
+        component={CompetitionScreen}
         options={{
           tabBarLabel: "Competitions",
           tabBarIcon: ({ color }) => (

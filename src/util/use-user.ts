@@ -287,7 +287,6 @@ export function useUser() {
     userPhone,
     userReg,
     userToken,
-    setUserToken,
     signIn,
     signOut,
     signUp,

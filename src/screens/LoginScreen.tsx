@@ -28,7 +28,6 @@ const LoginScreen: FC<LoginScreenProp> = (props) => {
     control,
     formState: { errors },
   } = useForm();
-
   const onSubmit = async (data: any) => {
     try {
       await signIn({ email: data?.email, password: data?.password });

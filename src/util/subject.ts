@@ -10,7 +10,7 @@ export async function useGetSubjects() {
     let regex = new RegExp(`(${subjectArea}|general)`, "i");
     const snapShots = await db.collection("subjects").get();
     const subjects = snapShots.docs.map((doc) => doc.data());
-    return subjects.filter((obj) => regex.test(obj?.subjectArea));
+    return subjects.filter((obj) => regex.test(obj?.subjectArea)) ?? [];
   } catch (error) {
     console.error(error);
   }

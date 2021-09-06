@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   VStack,
   CheckCircleIcon,
@@ -6,7 +6,6 @@ import {
   Heading,
   Pressable,
 } from "native-base";
-import { useEffect } from "react";
 
 interface Props {
   onTap: (title: string, checked: boolean) => void;
@@ -15,18 +14,25 @@ interface Props {
   items: string[];
 }
 
+/**
+ *
+ * @param
+ * @returns
+ */
 export default function SubjectCard({ onTap, title, image, items }: Props) {
   const [checked, checkedSet] = useState(false);
   const disable = items.length >= 4 && items.indexOf(title) == -1;
   const showCheckICon = checked && items.length <= 4;
+  const isEnglish = /english/i.test(title);
+
+  function tapper() {
+    checkedSet(!checked);
+    // onTap(title, checked);
+  }
+  if (isEnglish) onTap(title, checked);
 
   return (
-    <Pressable
-      disabled={disable}
-      onPress={() => checkedSet(!checked)}
-      onPressIn={() => onTap(title, checked)}
-      m={2}
-    >
+    <Pressable disabled={isEnglish || disable} onPressIn={tapper} m={2}>
       <VStack
         shadow={2}
         borderColor={checked && items.length <= 4 ? "brand.primary" : "white"}
@@ -38,7 +44,7 @@ export default function SubjectCard({ onTap, title, image, items }: Props) {
         justifyContent="space-around"
         alignItems="center"
       >
-        {showCheckICon && (
+        {(isEnglish || showCheckICon) && (
           <CheckCircleIcon
             size={5}
             color="green.700"

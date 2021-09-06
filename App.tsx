@@ -1,18 +1,42 @@
 import React from "react";
-import { View, Dimensions, LogBox } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import { View, Dimensions } from "react-native";
+
 import { useFonts } from "expo-font";
 import Apploading from "expo-app-loading";
-import StackNavigation from "./src/navigation/stackNavigation";
+import * as SplashScreen from "expo-splash-screen";
 import NetInfo from "@react-native-community/netinfo";
 import { useEffect } from "react";
+import { useUser } from "./src/util/use-user";
 
-export default function App() {
-  LogBox.ignoreLogs(["Setting a timer for a long period of time"]);
+export default function App(props: any) {
   let [fontsLoaded, error] = useFonts({
     Inter: require("./src/assets/fonts/inter.ttf"),
   });
+
+  const { userToken } = useUser();
+
   useEffect(() => {
+    async function loadResourcesAndDataAsync() {
+      try {
+        SplashScreen.preventAutoHideAsync();
+
+        // Load fonts
+        const token = await userToken();
+        if (token) {
+          SplashScreen.hideAsync();
+          props.navigation.navigate("drawer");
+        } else {
+          SplashScreen.hideAsync();
+          props.navigation.navigate("onboardingScreen");
+        }
+      } catch (e) {
+        // We might want to provide this error information to an error reporting service
+        console.warn(e);
+      } finally {
+        SplashScreen.hideAsync();
+      }
+    }
+    loadResourcesAndDataAsync();
     // Subscribe
     const unsubscribe = NetInfo.addEventListener((state) => {
       console.log("Connection type", state.type);
@@ -35,10 +59,6 @@ export default function App() {
       </View>
     );
   } else {
-    return (
-      <NavigationContainer>
-        <StackNavigation />
-      </NavigationContainer>
-    );
+    return null;
   }
 }

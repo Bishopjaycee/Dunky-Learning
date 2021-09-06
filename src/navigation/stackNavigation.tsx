@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "react-native-gesture-handler";
 // import { createStackNavigator } from "@react-navigation/stack";
-import SplashScreen from "../screens/SplashScreen";
 import OnboardingScreen from "../screens/OnboardingScreen";
 import welcomeScreen from "../screens/WelcomeScreen";
 import LoginScreen from "../screens/LoginScreen";
@@ -23,6 +22,8 @@ import TeacherAnnouncement from "./../screens/TeacherAnnouncement";
 import ListStudent from "./../screens/ListStudents";
 import WeeklyProgress from "./../screens/WeeklyProgressScreen";
 import MakeRemark from "./../screens/MakeRemark";
+import CompetitionStack from "./competitionStack";
+import App from "./../../App";
 
 const Stack = createNativeStackNavigator(); //createStackNavigator();
 
@@ -32,12 +33,13 @@ export default function StackNavigation() {
   }, []);
 
   return (
-    <Stack.Navigator initialRouteName="splash">
+    <Stack.Navigator initialRouteName="index">
       <Stack.Screen
-        name="splash"
-        component={SplashScreen}
+        name="index"
+        component={App}
         options={{ headerShown: false }}
       />
+
       <Stack.Screen
         name="onboardingScreen"
         component={OnboardingScreen}
@@ -131,6 +133,11 @@ export default function StackNavigation() {
       <Stack.Screen
         name="make-remark"
         component={MakeRemark}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="setup"
+        component={CompetitionStack}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

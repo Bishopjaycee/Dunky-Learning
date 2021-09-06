@@ -11,6 +11,7 @@ export default function quizJudge({ answers }: QuizJudgeProps): QuizJudge {
   const filteredAnswer = [];
   for (let i = 0; i < answers.length; i++) {
     if (i % 2 == 1) {
+      //Removes the indices that contains a string null as answer
       filteredAnswer.push(answers[i]);
     }
   }

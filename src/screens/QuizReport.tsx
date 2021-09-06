@@ -12,15 +12,8 @@ interface QuizReportProps {
 const QuizReport: FC<QuizReportProps> = ({ navigation, route }) => {
   const { correct, wrong, dunkEarned } = route.params;
 
-  // const [isLoaded, setIsLoaded] = useState(false);
   const { userRole } = useUser();
 
-  // useEffect(() => {
-  //   const unsubscribed = navigation.addListener("onPress", (e: any) => {
-  //     e.preventDefault();
-  //   });
-  //   return () => unsubscribed;
-  // }, [navigation]);
   console.log(correct, wrong, dunkEarned, "from report");
   return userRole ? (
     <VStack alignItems="center" py={4} bg="white" px={10} pb={8} h="100%">

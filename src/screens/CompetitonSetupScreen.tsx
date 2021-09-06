@@ -20,6 +20,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { SubjectModel } from "src/models/firebase.model";
 import { useGetSubjects } from "../util/subject";
 import { ActivityIndicator } from "react-native";
+import { useUser } from "./../util/use-user";
 
 interface CompetitionSetupScreenProps {
   route: any;
@@ -28,6 +29,7 @@ interface CompetitionSetupScreenProps {
 const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
   navigation,
 }) => {
+  const { userName } = useUser();
   const [currentPosition, currentPositionSet] = useState(0);
   const [selectedItem, selectedItemSet] = useState<string[]>([]);
   const [subjects, setSubjects] = useState<SubjectModel[]>([]);
@@ -36,6 +38,7 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
   const FactoryStepIndicator = Factory(StepIndicator);
 
   const tap = (title: string, checked: boolean) => {
+    //adds course to the selected item array
     if (checked) {
       selectedItemSet((prev) => {
         if (!prev.includes(title) && prev.length <= 4) {
@@ -45,20 +48,22 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
         }
       });
     }
+
+    //removes unchecked course in the selected item array
     if (!checked) {
       let items = selectedItem.slice(0);
       let index = items.indexOf(title);
       items.splice(index, 1);
       selectedItemSet(items);
     }
-    console.log(selectedItem);
   };
+
   const {
     handleSubmit,
     control,
     formState: { errors, isValid },
   } = useForm();
-
+  console.log(selectedItem);
   const onSubmit = (data: any) => {
     if (currentPosition < 2) {
       currentPositionSet(currentPosition + 1);
@@ -78,10 +83,18 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
     };
   }, [subjects]);
 
+  if (subjects.length <= 0 && isLoaded) {
+    return (
+      <VStack w="full" h="full" justifyContent="center" alignItems="center">
+        <Text textAlign="center">No subject loaded</Text>
+      </VStack>
+    );
+  }
+
   return (
-    <VStack bg="white" h="100%">
-      <Heading mt={10} fontSize="xl" mx={4} ml={12}>
-        Welcome Paul
+    <VStack bg="white" h="100%" pt={8}>
+      <Heading mt={10} fontSize="xl" mx={4} ml={12} fontWeight="800">
+        Welcome {userName?.split(" ")[0]},
       </Heading>
       <Text mx={6} ml={12} my={4} fontSize="md" fontFamily="Inter">
         Setting up your game space
