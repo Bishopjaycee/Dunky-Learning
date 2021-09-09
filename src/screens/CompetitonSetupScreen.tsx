@@ -10,17 +10,16 @@ import {
   Button,
   Icon,
   Input,
-  Box,
 } from "native-base";
 import React, { FC, useState, useEffect } from "react";
 import StepIndicator from "react-native-step-indicator";
 import SubjectCard from "./../components/subjectCard";
 import { useForm, Controller } from "react-hook-form";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { SubjectModel } from "src/models/firebase.model";
-import { useGetSubjects } from "../util/subject";
+import { SubjectModel } from "../models/firebase.model";
 import { ActivityIndicator } from "react-native";
 import { useUser } from "./../util/use-user";
+import { useGetSubjects } from "../util/subject";
 
 interface CompetitionSetupScreenProps {
   route: any;
@@ -31,7 +30,7 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
 }) => {
   const { userName } = useUser();
   const [currentPosition, currentPositionSet] = useState(0);
-  const [selectedItem, selectedItemSet] = useState<string[]>([]);
+  const [selectedItem, selectedItemSet] = useState<string[]>(["English"]);
   const [subjects, setSubjects] = useState<SubjectModel[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -39,7 +38,7 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
 
   const tap = (title: string, checked: boolean) => {
     //adds course to the selected item array
-    if (checked) {
+    if (!checked) {
       selectedItemSet((prev) => {
         if (!prev.includes(title) && prev.length <= 4) {
           return [...prev, title];
@@ -49,8 +48,8 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
       });
     }
 
-    //removes unchecked course in the selected item array
-    if (!checked) {
+    //removes checked course in the selected item array
+    if (checked) {
       let items = selectedItem.slice(0);
       let index = items.indexOf(title);
       items.splice(index, 1);
@@ -63,7 +62,7 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
     control,
     formState: { errors, isValid },
   } = useForm();
-  console.log(selectedItem);
+
   const onSubmit = (data: any) => {
     if (currentPosition < 2) {
       currentPositionSet(currentPosition + 1);
@@ -71,6 +70,8 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
       null;
     }
   };
+
+  //Load the subject from the database
   async function getSubjects() {
     const subjects = await useGetSubjects();
     setSubjects(subjects as unknown as SubjectModel[]);
@@ -81,7 +82,7 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
     return () => {
       getSubjects();
     };
-  }, [subjects]);
+  }, []);
 
   if (subjects.length <= 0 && isLoaded) {
     return (

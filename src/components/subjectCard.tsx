@@ -27,9 +27,13 @@ export default function SubjectCard({ onTap, title, image, items }: Props) {
 
   function tapper() {
     checkedSet(!checked);
-    // onTap(title, checked);
+    onTap(title, checked);
   }
-  if (isEnglish) onTap(title, checked);
+  useEffect(() => {
+    if (isEnglish) {
+      onTap(title, checked);
+    }
+  }, [title]);
 
   return (
     <Pressable disabled={isEnglish || disable} onPressIn={tapper} m={2}>
