@@ -54,7 +54,7 @@ function OTPVerificationScreen(props: OTPProps) {
     try {
       await addPhoneCredentials({ phone, verificationId, otp: data?.otp });
       if (!isLoading && !error) props.navigation.navigate("successScreen");
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert(error);
       console.error(error);
     }
@@ -154,6 +154,7 @@ function OTPVerificationScreen(props: OTPProps) {
           mb={7}
           mt={40}
           mx={5}
+          isDisabled={isLoading}
           _pressed={{ backgroundColor: "brand.bg1" }}
           onPress={handleSubmit(onSubmit)}
           isLoading={isLoading}

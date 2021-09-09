@@ -5,5 +5,6 @@ export const firebaseConfig = {
   projectId: "dunky-152a0",
   storageBucket: "dunky-152a0.appspot.com",
   messagingSenderId: "276776073361",
+  databaseURL: "https://dunky-152a0-default-rtdb.firebaseio.com/",
   appId: "1:276776073361:web:ecbbf8ea161e8609ea6730",
 };

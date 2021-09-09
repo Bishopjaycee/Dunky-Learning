@@ -65,31 +65,36 @@ interface HomeProp {
 const HomeScreen: FC<HomeProp> = ({ navigation }) => {
   const [value, setValue] = useState("");
   const [dunkPoint, setDunkPoint] = useState(1000);
-
+  const [isLoaded, setIsLoaded] = useState(false);
   const { height } = useWindowDimensions();
-  const {  userId, userName, isLoading } = useUser();
+  const { userId, userName, isLoading } = useUser();
 
   useEffect(() => {
-    try {
-      if (!isLoading) {
-        db.collection("students")
-          .doc(userId)
-          .get()
-          .then((doc) => {
-            setDunkPoint(doc.data()?.dunkPoint);
-          });
+    function load() {
+      try {
+        if (userId) {
+          db.collection("students")
+            .doc(userId)
+            .get()
+            .then((doc) => {
+              setDunkPoint(doc.data()?.dunkPoint);
+              setIsLoaded(true);
+            });
+        }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
     }
-  }, [dunkPoint, isLoading]);
+    load();
+    return () => load();
+  }, [dunkPoint, userId, isLoaded]);
 
   return !isLoading ? (
     <VStack bg="white" px={8} h={height}>
       <HamburgerAndBell navigation={navigation} />
       <Box mt={4}>
         <Heading fontSize={18} my={4}>
-          {`Hello ${userName?.split(" ")[0]},`}
+          {`Hello ${userName?.split(" ")[0] ?? ""},`}
         </Heading>
         <Text textAlign="left">
           Welcome to Dunky Learning. What’s on your mind today?
@@ -122,7 +127,11 @@ const HomeScreen: FC<HomeProp> = ({ navigation }) => {
         mt={6}
       >
         <Text fontWeight="bold">Dunk Balance</Text>
-        <Text>{dunkPoint}</Text>
+        {isLoaded ? (
+          <Text>{dunkPoint}</Text>
+        ) : (
+          <ActivityIndicator color="#5956E9" size="small" />
+        )}
       </HStack>
       <SimpleGrid columns={2} space={5} my={4}>
         {data.map((item, index) => (

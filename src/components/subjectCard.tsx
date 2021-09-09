@@ -39,7 +39,11 @@ export default function SubjectCard({ onTap, title, image, items }: Props) {
     <Pressable disabled={isEnglish || disable} onPressIn={tapper} m={2}>
       <VStack
         shadow={2}
-        borderColor={checked && items.length <= 4 ? "brand.primary" : "white"}
+        borderColor={
+          isEnglish || (checked && items.length <= 4)
+            ? "brand.primary"
+            : "white"
+        }
         borderWidth={1}
         borderRadius={5}
         bg={"white"}

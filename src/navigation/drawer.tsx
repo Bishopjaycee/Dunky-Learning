@@ -77,7 +77,8 @@ function CustomDrawerContent(props: any) {
   );
 }
 
-function HomeComponent(role: any, error: any) {
+function HomeComponent(role: any) {
+
   switch (role) {
     case "student":
       return StudentTap;
@@ -89,7 +90,7 @@ function HomeComponent(role: any, error: any) {
       return () => (
         <VStack justifyContent="center" alignItems="center" mt={20} p={20}>
           <ActivityIndicator size="large" color="#5956E9" />
-          <Text>{error}</Text>
+          {/* <Text>It is me</Text> */}
         </VStack>
       );
   }
@@ -100,6 +101,7 @@ export default function MyDrawer() {
   useEffect(() => {
     getUserRole();
   }, [userRole]);
+
   return userRole != null ? (
     <Drawer.Navigator
       drawerContent={(props: any) => <CustomDrawerContent {...props} />}
@@ -112,7 +114,7 @@ export default function MyDrawer() {
     >
       <Drawer.Screen
         name="Home"
-        component={HomeComponent(userRole, error)}
+        component={HomeComponent(userRole)}
         options={{
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
@@ -145,7 +147,7 @@ export default function MyDrawer() {
   ) : (
     <VStack justifyContent="center" alignItems="center" mt={20} p={20}>
       <ActivityIndicator size="large" color="#5956E9" />
-      {userRole}
+      {/* <Text>Tell me not</Text> */}
     </VStack>
   );
 }

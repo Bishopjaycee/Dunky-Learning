@@ -59,24 +59,24 @@ interface SettingProp {
 }
 
 const SettingScreen: FC<SettingProp> = ({ navigation }) => {
-  const [reg, setReg] = useState("");
+  // const [reg, setReg] = useState("");
   const [loading, setLoading] = useState(true);
-  const { user, userReg, userRole, userName, getUserRole, userId } = useUser();
+  const { userReg, userRole, userName, getUserRole, userId } = useUser();
 
-  async function getData() {
-    const doc = await db.collection(`${userRole}s`).doc(userId).get();
-    setReg(doc.data()?.regNo);
-  }
+  // async function getData() {
+  //   const doc = await db.collection(`${userRole}s`).doc(userId).get();
+  //   setReg(doc.data()?.regNo);
+  // }
 
-  useEffect(() => {
-    getUserRole();
-    getData().then(() => {
-      setLoading(false);
-    });
-    return () => {
-      getData();
-    };
-  }, []);
+  // useEffect(() => {
+  //   getUserRole();
+  //   getData().then(() => {
+  //     setLoading(false);
+  //   });
+  //   return () => {
+  //     getData();
+  //   };
+  // }, []);
 
   useEffect(() => {
     const unsubscribed = navigation.addListener("onPress", (e: any) => {
@@ -114,6 +114,7 @@ const SettingScreen: FC<SettingProp> = ({ navigation }) => {
                 </Text>
               ) : (
                 <Spinner
+                  size="sm"
                   accessibilityLabel="Loading your reg number"
                   color="primary.600"
                 />

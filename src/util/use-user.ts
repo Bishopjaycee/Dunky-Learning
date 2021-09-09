@@ -1,5 +1,5 @@
-import { auth, db, phoneProvider, getServerTimestamp } from "./firebase";
-import { useState, useEffect } from "react";
+import { auth, db, phoneProvider, getServerTimestamp, relDB } from "./firebase";
+import { useState, useEffect, useDebugValue } from "react";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import regNoGenerator from "./regNoGenerator";
 
@@ -23,6 +23,25 @@ export function useUser() {
     error: "",
   });
 
+  useEffect(() => {
+    // onChange is called when firebase loads up the user from persistent storage or
+    // when the auth changes.
+    const onChange = (currentUser: any) => {
+      setUserState({ user: currentUser, isLoading: false, error: "" });
+    };
+    // onError is called ONLY when onAuthStateChanged encounters an error - not when
+    // signIn or signOut error.
+    const onError = (error: any) => {
+      console.error(error);
+      setUserState({ user: null, isLoading: false, error: error?.message });
+    };
+
+    const unsubscribe = auth.onAuthStateChanged(onChange, onError);
+    // Return a function from your effect to register some function to run
+    // when the effect is cleaned up.
+    return unsubscribe;
+  }, []);
+
   const { user, isLoading, error } = userState;
   const signedIn = user != null;
   const userId = signedIn ? user?.uid : undefined;
@@ -30,6 +49,63 @@ export function useUser() {
   const userPhone = signedIn ? user?.phoneNumber : undefined;
   const [userRole, setLocalUserRole] = useState("");
   const [userReg, setReg] = useState("");
+  // const [isOnline, setIsOnline] = useState(false);
+
+  // // setup for user presence
+
+  // useEffect(() => {
+  //   getUserRole();
+  //   // Assuming user is logged in
+  //   // const userId = auth.currentUser?.uid;
+
+  //   if (!userRole) {
+  //     return;
+  //   }
+
+  //   const reference = relDB.ref(`/online/${userId}`);
+  //   const fireStoreRef = db.collection(`${userRole}s`).doc(userId);
+
+  //   // Set the /users/:userId value to true
+  //   reference.set(true).then(() => {
+  //     // console.log("Online presence set");
+  //   });
+
+  //   reference.on("child_changed", function (doc) {
+  //     if (doc.val() == true) {
+  //       setIsOnline(true);
+  //       fireStoreRef.set(
+  //         {
+  //           online: true,
+  //           last_seen: getServerTimestamp(),
+  //         },
+  //         { merge: true }
+  //       );
+  //       console.log(doc.val());
+  //     }
+  //     fireStoreRef.set(
+  //       {
+  //         online: false,
+  //         last_seen: getServerTimestamp(),
+  //       },
+  //       { merge: true }
+  //     );
+  //   });
+  //   // Remove the node whenever the client disconnects
+  //   reference
+  //     .onDisconnect()
+  //     .remove()
+  //     .then(() => {
+  //       setIsOnline(false);
+  //       fireStoreRef.set(
+  //         {
+  //           online: false,
+  //           last_seen: getServerTimestamp(),
+  //         },
+  //         { merge: true }
+  //       );
+  //       // console.log("On disconnect function configured.");
+  //     });
+  // }, []);
 
   /**
    * Stores user's data from firebase to the local storage
@@ -48,6 +124,7 @@ export function useUser() {
     }
   };
 
+  //Fetches cached user doc from firebase
   useEffect(() => {
     getUserData()
       .then((user) => {
@@ -58,21 +135,24 @@ export function useUser() {
       .catch((err) => {
         console.error(err);
       });
-  }, [userRole, userReg]);
+  }, [userReg, userRole]);
 
   const getUserRole = async function () {
+    setUserState({ user, isLoading: true, error: "" });
     try {
       const role = await getUserData().then(
         (data) => data != null && JSON.parse(data)?.role
       );
+
       if (role != null && role != "") {
         setLocalUserRole(role as unknown as string);
+        setUserState({ user, isLoading: false, error: "" });
         return;
       }
 
-      const stRef = await db.collection("students").doc(userId).get();
-      const tRef = await db.collection("teachers").doc(userId).get();
-      const ptRef = await db.collection("parents").doc(userId).get();
+      const stRef = await db.collection("students").doc(user?.uid).get();
+      const tRef = await db.collection("teachers").doc(user?.uid).get();
+      const ptRef = await db.collection("parents").doc(user?.uid).get();
 
       if (stRef.exists) {
         setLocalUserRole(stRef.data()?.role);
@@ -81,9 +161,11 @@ export function useUser() {
       } else if (ptRef.exists) {
         setLocalUserRole(ptRef.data()?.role);
       } else {
-        console.error("Invalid user id entered");
+        console.error("unable to fetch user role with this id: " + userId);
       }
-    } catch (error) {
+      setUserState({ user, isLoading: false, error: "" });
+    } catch (error: any) {
+      setUserState({ user, isLoading: false, error: error?.message });
       console.error(error);
     }
   };
@@ -93,24 +175,6 @@ export function useUser() {
     const token = (await user?.getIdTokenResult())?.token;
     await setToken(token as unknown as string);
   };
-
-  useEffect(() => {
-    // onChange is called when firebase loads up the user from persistent storage or
-    // when the auth changes.
-    const onChange = (currentUser: any) => {
-      setUserState({ user: currentUser, isLoading: false, error: "" });
-    };
-    // onError is called ONLY when onAuthStateChanged encounters an error - not when
-    // signIn or signOut error.
-    const onError = (error: any) => {
-      console.error(error);
-      setUserState({ user: null, isLoading: false, error: error?.message });
-    };
-    const unsubscribe = auth.onAuthStateChanged(onChange, onError);
-    // Return a function from your effect to register some function to run
-    // when the effect is cleaned up.
-    return unsubscribe;
-  }, []);
 
   /**
    * user signup method
@@ -171,7 +235,7 @@ export function useUser() {
       });
       await persistUser(payload?.role, credential.user?.uid as string);
       setUserState({ user: credential.user, isLoading: false, error: "" });
-    } catch (err) {
+    } catch (err: any) {
       setUserState({ user: null, isLoading: false, error: err?.message });
       console.error(err);
     }
@@ -210,7 +274,7 @@ export function useUser() {
       console.group("linking phone number...");
 
       const credential = phoneProvider.credential(verificationId, otp);
-      user?.linkWithCredential(credential).then(({ user: usr }) => {
+      user?.linkWithCredential(credential).then(({ user: usr }: any) => {
         const [fname, lname] = userName?.split(" ") as any;
         if (role == "student") {
           console.log("reg number created...");
@@ -233,8 +297,8 @@ export function useUser() {
       console.groupEnd();
       setUserState({ user: user, isLoading: false, error: "" });
       setUserToken();
-    } catch (err) {
-      setUserState({ user, isLoading: false, error: err });
+    } catch (err: any) {
+      setUserState({ user, isLoading: false, error: err?.message });
       console.error(err);
     }
   };
@@ -262,7 +326,7 @@ export function useUser() {
       getUserRole();
       setUserToken();
       await persistUser(userRole, credential.user?.uid as string); //TODO FUNCTION
-    } catch (error) {
+    } catch (error: any) {
       setUserState({ user: null, isLoading: false, error: error?.message });
       console.error(error?.message);
     }
@@ -279,8 +343,7 @@ export function useUser() {
       console.error(error);
     }
   };
-  return {
-    user,
+  useDebugValue({
     userId,
     userName,
     userRole,
@@ -294,5 +357,23 @@ export function useUser() {
     isLoading,
     getUserRole,
     error,
+    // isOnline,
+  });
+
+  return {
+    userId,
+    userName,
+    userRole,
+    userPhone,
+    userReg,
+    userToken,
+    signIn,
+    signOut,
+    signUp,
+    addPhoneCredentials,
+    isLoading,
+    getUserRole,
+    error,
+    // isOnline,
   };
 }

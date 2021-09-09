@@ -67,7 +67,8 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
     if (currentPosition < 2) {
       currentPositionSet(currentPosition + 1);
     } else {
-      null;
+      console.log(data.name);
+      navigation.navigate("team-setup");
     }
   };
 
@@ -187,7 +188,7 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
                     placeholderTextColor={"blueGray.400"}
                   />
                 )}
-                name="username"
+                name="name"
                 defaultValue=""
                 rules={{ required: true, minLength: 4 }}
               />
