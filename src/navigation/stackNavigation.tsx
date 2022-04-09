@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "react-native-gesture-handler";
 // import { createStackNavigator } from "@react-navigation/stack";
+import App from "./../../App";
 import OnboardingScreen from "../screens/OnboardingScreen";
 import welcomeScreen from "../screens/WelcomeScreen";
 import LoginScreen from "../screens/LoginScreen";
@@ -10,7 +11,6 @@ import OTPVerificationScreen from "../screens/OTPVerificationScreen";
 import SuccessScreen from "../screens/SuccessScreen";
 import SuccessScreen2 from "../screens/SuccessScreen2";
 import MyDrawer from "./drawer";
-import firebase from "firebase/app";
 import QuizScreen from "./../screens/QuizScreen";
 import QuizReport from "./../screens/QuizReport";
 import CreateAssignment from "./../screens/CreateAssignment";
@@ -23,15 +23,12 @@ import ListStudent from "./../screens/ListStudents";
 import WeeklyProgress from "./../screens/WeeklyProgressScreen";
 import MakeRemark from "./../screens/MakeRemark";
 import CompetitionStack from "./competitionStack";
-import App from "./../../App";
+import TeamCreationScreen from "../screens/TeamCreationScreen";
+import TeamDetailsScreen from "./../screens/TeamDetails";
 
 const Stack = createNativeStackNavigator(); //createStackNavigator();
 
 export default function StackNavigation() {
-  useEffect(() => {
-    firebase.auth().currentUser;
-  }, []);
-
   return (
     <Stack.Navigator initialRouteName="index">
       <Stack.Screen
@@ -138,6 +135,16 @@ export default function StackNavigation() {
       <Stack.Screen
         name="setup"
         component={CompetitionStack}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="create-team"
+        component={TeamCreationScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="team-details"
+        component={TeamDetailsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

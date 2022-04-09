@@ -16,7 +16,6 @@ import { ActivityIndicator, LogBox } from "react-native";
 import QuizButton from "../components/quizButtons";
 import { useCallback } from "react";
 import quizJudge from "../util/quizJudge";
-import useTimer from "./../hooks/timerFunction";
 
 interface QuizScreenProps {
   navigation: any;
@@ -31,13 +30,13 @@ const QuizScreen: FC<QuizScreenProps> = ({ navigation, route }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [questions, setQuestions] = useState<QuestionModel[]>([]);
   const [curIndex, setCurIndex] = useState(1);
-  const [timer, setTimer] = useState(20);
+  const [timer, setTimer] = useState(30);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [nextClk, setNext] = useState(false); //tells auto indexer to check if user already moved to the next question
 
   const loadQuestions = useMemo(() => {
     getQuestions({ subject: subjectTitle.toLowerCase(), level: 0 }).then(
-      (data) => {
+      (data: any) => {
         setQuestions(data);
         setIsLoaded(true);
       }
@@ -67,7 +66,12 @@ const QuizScreen: FC<QuizScreenProps> = ({ navigation, route }) => {
   );
   const report = () => {
     const { correct, wrong, dunkEarned } = quizJudge({ answers });
-    navigation.navigate("quiz-report", { correct, wrong, dunkEarned });
+    navigation.navigate("quiz-report", {
+      correct,
+      wrong,
+      dunkEarned,
+      length: questions.length,
+    });
   };
   const next = () => {
     if (curIndex < questions.length) {
@@ -96,9 +100,11 @@ const QuizScreen: FC<QuizScreenProps> = ({ navigation, route }) => {
     }
 
     if (timer <= 0 && curIndex <= questions.length) {
-      if (!nextClk) next();
+      if (!nextClk) {
+        next();
+      }
       setNext(!nextClk);
-      setTimer(curIndex >= questions.length ? 0 : 20);
+      setTimer(curIndex >= questions.length ? 0 : 30);
     }
     if (timer <= 0 && curIndex == questions.length) {
       clearInterval(unsubscribeTimer);

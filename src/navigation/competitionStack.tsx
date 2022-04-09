@@ -2,7 +2,8 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import CompetitionSetupScreen from "./../screens/CompetitonSetupScreen";
-import CompetitionTeamSetup from "./../screens/CompetitionTeamSetup";
+
+import TeamSelection from "../screens/TeamSelectionScreen";
 
 const CompStack = createStackNavigator();
 
@@ -14,9 +15,10 @@ const CompetitionStack = () => {
         component={CompetitionSetupScreen}
         options={{ headerShown: false }}
       />
+    
       <CompStack.Screen
-        name="team-setup"
-        component={CompetitionTeamSetup}
+        name="select-team"
+        component={TeamSelection}
         options={{ headerShown: false }}
       />
     </CompStack.Navigator>

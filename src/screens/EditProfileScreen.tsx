@@ -78,9 +78,9 @@ const EditProfileScreen: FC<EditProfileScreenProp> = ({ navigation }) => {
 
   const { getItem: getRole } = useAsyncStorage("@role");
   const { mergeItem: mergeUser } = useAsyncStorage("@user");
-  const { user } = useUser();
-  const fname = user?.displayName?.split(" ")[0];
-  const lname = user?.displayName?.split(" ")[1];
+  const { userName, user } = useUser();
+  const fname = userName?.split(" ")[0];
+  const lname = userName?.split(" ")[1];
 
   const onSelectItemsChange = (selectedItem: any[]) => {
     setSelectedItems(selectedItem);
@@ -134,13 +134,16 @@ const EditProfileScreen: FC<EditProfileScreenProp> = ({ navigation }) => {
     let role = await getRole();
     const doc = db.collection(`${role}s`).doc(user?.uid).get();
     const data = (await doc).data();
-    console.log(data, "data from ed");
+
     setUserData(data);
     setIsLoaded(true);
   };
 
   useEffect(() => {
     getUserData();
+    return () => {
+      getUserData();
+    };
   }, [isLoaded]);
   return (
     <VStack p={5} h="100%" bg="white" pt={10}>

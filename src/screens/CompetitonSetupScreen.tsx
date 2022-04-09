@@ -10,6 +10,8 @@ import {
   Button,
   Icon,
   Input,
+  Image,
+  Box,
 } from "native-base";
 import React, { FC, useState, useEffect } from "react";
 import StepIndicator from "react-native-step-indicator";
@@ -20,6 +22,8 @@ import { SubjectModel } from "../models/firebase.model";
 import { ActivityIndicator } from "react-native";
 import { useUser } from "./../util/use-user";
 import { useGetSubjects } from "../util/subject";
+import Svg, { Path } from "react-native-svg";
+import useGame from "../util/use-game";
 
 interface CompetitionSetupScreenProps {
   route: any;
@@ -29,6 +33,8 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
   navigation,
 }) => {
   const { userName } = useUser();
+  const { addGameDetails } = useGame();
+
   const [currentPosition, currentPositionSet] = useState(0);
   const [selectedItem, selectedItemSet] = useState<string[]>(["English"]);
   const [subjects, setSubjects] = useState<SubjectModel[]>([]);
@@ -66,9 +72,11 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
   const onSubmit = (data: any) => {
     if (currentPosition < 2) {
       currentPositionSet(currentPosition + 1);
-    } else {
-      console.log(data.name);
-      navigation.navigate("team-setup");
+
+      addGameDetails({
+        subjects: selectedItem,
+        gameName: data.name,
+      });
     }
   };
 
@@ -207,68 +215,62 @@ const CompetitionSetupScreen: FC<CompetitionSetupScreenProps> = ({
         </VStack>
       )}
       {currentPosition == 2 && (
-        <VStack p={6}>
-          <Text m={2} fontSize="xs">
-            Lets see how you shoot shots
+        <VStack>
+          <Text my={6} px={6} fontSize="sm" textAlign="center">
+            Are you ready for a mind blowing learning experience?
           </Text>
-          <FormControl isInvalid={errors?.question}>
-            <VStack m={2}>
-              <FormControl.Label
-                _text={{ fontSize: 16, fontWeight: "700", marginY: 0 }}
-              >
-                What is the largest river in the world?
-              </FormControl.Label>
-              <Controller
-                control={control}
-                render={({ field: { onChange, onBlur, value, ref } }) => (
-                  <Input
-                    onBlur={onBlur}
-                    onChangeText={(val) => onChange(val)}
-                    value={value}
-                    ref={ref}
-                    borderColor="brand.bg2"
-                    _focus={{ borderColor: "brand.primary" }}
-                    variant="underlined"
-                    placeholder="Answer"
-                    my={2}
-                    placeholderTextColor={"blueGray.400"}
-                  />
-                )}
-                name="question"
-                defaultValue=""
-                rules={{ required: true, minLength: 3 }}
+          <Box w="100%" mt={20}>
+            <Text px={8} my={3}>
+              Championship Category
+            </Text>
+            <HStack justifyContent="center" px={4}>
+              <CategoryCard
+                navigation={navigation}
+                competition="Intra School"
+                image={require("../assets/images/intra-school.png")}
               />
-              <FormControl.ErrorMessage>
-                Answer required
-              </FormControl.ErrorMessage>
-            </VStack>
-            <Pressable onPress={() => navigation.navigate("team-setup")}>
-              <Text
-                fontSize="md"
-                fontWeight="bold"
-                color="brand.primary"
-                textAlign="right"
-                mr={4}
-              >
-                Skip
-              </Text>
-            </Pressable>
-          </FormControl>
-          <Button
-            variant="solid"
-            bg={isValid ? "brand.primary" : "brand.bg2"}
-            my={10}
-            _pressed={{ backgroundColor: "brand.bg1" }}
-            onPress={handleSubmit(onSubmit)}
-          >
-            Dunk
-          </Button>
+              <CategoryCard
+                navigation={navigation}
+                competition="Inter School"
+                image={require("../assets/images/inter-school.png")}
+                locked={true}
+              />
+
+              <CategoryCard
+                navigation={navigation}
+                competition="Inter School"
+                image={require("../assets/images/regional.png")}
+                locked={true}
+              />
+            </HStack>
+          </Box>
+          {/* <Box px={4} mt={8}>
+            <Button
+              variant="solid"
+              bg={isValid ? "brand.primary" : "brand.bg2"}
+              my={4}
+              _pressed={{ backgroundColor: "brand.bg1" }}
+              onPress={handleSubmit(onSubmit)}
+            >
+              Dunk
+            </Button>
+            <Button
+              variant="solid"
+              bg={isValid ? "brand.primary" : "brand.bg2"}
+              my={2}
+              _pressed={{ backgroundColor: "brand.bg1" }}
+              onPress={handleSubmit(onSubmit)}
+            >
+              Dunk
+            </Button>
+          </Box> */}
         </VStack>
       )}
     </VStack>
   );
 };
 
+export default CompetitionSetupScreen;
 const customStyles = {
   stepIndicatorSize: 25,
   currentStepIndicatorSize: 30,
@@ -292,4 +294,71 @@ const customStyles = {
   labelSize: 13,
   currentStepLabelColor: "#5956E9",
 };
-export default CompetitionSetupScreen;
+
+interface CategoryCard {
+  navigation: any;
+  competition: string;
+  image: any;
+  locked: boolean;
+}
+
+function CategoryCard({
+  competition,
+  navigation,
+  image,
+  locked = false,
+}: Partial<CategoryCard>) {
+  return (
+    <Pressable
+      d="flex"
+      alignItems="center"
+      shadow={2}
+      bg="white"
+      w={"30%"}
+      px={4}
+      py={6}
+      alignSelf="center"
+      m={2}
+      onPress={() =>
+        navigation.navigate("select-team", { competitionType: competition })
+      }
+      rounded={5}
+      _disabled={{ bg: "gray.100" }}
+      disabled={locked}
+    >
+      <Image source={image} alt="team-name" size="60px" m="auto" />
+      <Heading fontSize={11} textAlign="center" my={2}>
+        {competition}
+      </Heading>
+      {locked ? (
+        <Svg width="26" height="24" viewBox="0 0 26 24" fill="none">
+          <Path
+            d="M17.566 9.44731V7.30031C17.566 4.78731 15.4431 2.74931 12.8254 2.74931C10.2077 2.73831 8.0764 4.76631 8.06494 7.28031V7.30031V9.44731"
+            stroke="#868686"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <Path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M16.7949 21.2491H8.83556C6.65431 21.2491 4.88556 19.5521 4.88556 17.4571V13.1681C4.88556 11.0731 6.65431 9.3761 8.83556 9.3761H16.7949C18.9762 9.3761 20.7449 11.0731 20.7449 13.1681V17.4571C20.7449 19.5521 18.9762 21.2491 16.7949 21.2491Z"
+            stroke="#868686"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <Path
+            d="M12.8155 14.2023V16.4233"
+            stroke="#868686"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </Svg>
+      ) : (
+        <Box size={6} />
+      )}
+    </Pressable>
+  );
+}

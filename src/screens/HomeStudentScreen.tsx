@@ -64,30 +64,8 @@ interface HomeProp {
 
 const HomeScreen: FC<HomeProp> = ({ navigation }) => {
   const [value, setValue] = useState("");
-  const [dunkPoint, setDunkPoint] = useState(1000);
-  const [isLoaded, setIsLoaded] = useState(false);
   const { height } = useWindowDimensions();
-  const { userId, userName, isLoading } = useUser();
-
-  useEffect(() => {
-    function load() {
-      try {
-        if (userId) {
-          db.collection("students")
-            .doc(userId)
-            .get()
-            .then((doc) => {
-              setDunkPoint(doc.data()?.dunkPoint);
-              setIsLoaded(true);
-            });
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    load();
-    return () => load();
-  }, [dunkPoint, userId, isLoaded]);
+  const { userId, userName, isLoading, dunkPoint } = useUser();
 
   return !isLoading ? (
     <VStack bg="white" px={8} h={height}>
@@ -127,7 +105,7 @@ const HomeScreen: FC<HomeProp> = ({ navigation }) => {
         mt={6}
       >
         <Text fontWeight="bold">Dunk Balance</Text>
-        {isLoaded ? (
+        {dunkPoint > 0 ? (
           <Text>{dunkPoint}</Text>
         ) : (
           <ActivityIndicator color="#5956E9" size="small" />

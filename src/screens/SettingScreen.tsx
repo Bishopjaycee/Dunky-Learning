@@ -59,24 +59,7 @@ interface SettingProp {
 }
 
 const SettingScreen: FC<SettingProp> = ({ navigation }) => {
-  // const [reg, setReg] = useState("");
-  const [loading, setLoading] = useState(true);
-  const { userReg, userRole, userName, getUserRole, userId } = useUser();
-
-  // async function getData() {
-  //   const doc = await db.collection(`${userRole}s`).doc(userId).get();
-  //   setReg(doc.data()?.regNo);
-  // }
-
-  // useEffect(() => {
-  //   getUserRole();
-  //   getData().then(() => {
-  //     setLoading(false);
-  //   });
-  //   return () => {
-  //     getData();
-  //   };
-  // }, []);
+  const { userImg, userReg, userRole, userName } = useUser();
 
   useEffect(() => {
     const unsubscribed = navigation.addListener("onPress", (e: any) => {
@@ -90,7 +73,7 @@ const SettingScreen: FC<SettingProp> = ({ navigation }) => {
       <Box bg="white" h="10%" w="100%" p={2} />
       <VStack alignItems="center" mb={4} mt={-5}>
         <Avatar
-          source={require("../assets/images/trophy.png")}
+          source={{ uri: userImg as string }}
           pos="relative"
           size="lg"
           top={8}
@@ -108,7 +91,7 @@ const SettingScreen: FC<SettingProp> = ({ navigation }) => {
           </Text>
           {userRole == "student" && (
             <>
-              {!loading ? (
+              {userReg != "" ? (
                 <Text textAlign="center" mb={4}>
                   User ID: {userReg}
                 </Text>

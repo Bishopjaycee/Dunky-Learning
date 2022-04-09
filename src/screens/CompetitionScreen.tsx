@@ -8,6 +8,7 @@ import {
   Pressable,
 } from "native-base";
 import React, { FC, useState, useEffect } from "react";
+import { useUser } from "./../util/use-user";
 
 interface CompetitionProp {
   navigation: any;
@@ -15,6 +16,7 @@ interface CompetitionProp {
 
 const CompetitionScreen: FC<CompetitionProp> = ({ navigation }) => {
   const [_modal, setModal] = useState(false);
+  const { dunkPoint } = useUser();
   const modalOpenClose = () => {
     if (_modal) {
       setModal(false);
@@ -32,22 +34,51 @@ const CompetitionScreen: FC<CompetitionProp> = ({ navigation }) => {
           m={4}
           p={2}
         >
-          <Text fontSize="sm" textAlign="center" p={4} fontFamily="Inter">
-            Congratulation, you have successfully Unlockd this months
-            competition. click next to continue
-          </Text>
-          <Button
-            variant="solid"
-            color="white"
-            bg="brand.primary"
-            my={4}
-            mx={6}
-            _pressed={{ backgroundColor: "brand.bg1", color: "brand.primary" }}
-            _text={{ color: "white" }}
-            onPress={() => navigation.navigate("setup")}
-          >
-            Next
-          </Button>
+          {dunkPoint >= 5000 ? (
+            <>
+              <Text fontSize="sm" textAlign="center" p={4} fontFamily="Inter">
+                Congratulation, you have successfully Unlockd the Dunky
+                Championship. click next to continue
+              </Text>
+              <Button
+                variant="solid"
+                color="white"
+                bg="brand.primary"
+                my={4}
+                mx={6}
+                _pressed={{
+                  backgroundColor: "brand.bg1",
+                  color: "brand.primary",
+                }}
+                _text={{ color: "white" }}
+                onPress={() => navigation.navigate("setup")}
+              >
+                Next
+              </Button>
+            </>
+          ) : (
+            <>
+              <Text fontSize="sm" textAlign="center" p={4} fontFamily="Inter">
+                Oops! Your not eligible for this championship! Take some quiz to
+                earn more dunk points.
+              </Text>
+              <Button
+                variant="solid"
+                color="white"
+                bg="brand.primary"
+                my={4}
+                mx={6}
+                _pressed={{
+                  backgroundColor: "brand.bg1",
+                  color: "brand.primary",
+                }}
+                _text={{ color: "white" }}
+                onPress={() => navigation.navigate("subjectScreen")}
+              >
+                Take quiz
+              </Button>
+            </>
+          )}
         </VStack>
       )}
       <Pressable onPress={() => modalOpenClose()}>
@@ -68,11 +99,10 @@ const CompetitionScreen: FC<CompetitionProp> = ({ navigation }) => {
             textAlign="center"
             fontFamily="Inter"
           >
-            WELCOME TO THE DUNKY Championship LEAGUE
+            WELCOME TO THE DUNKY Championship
           </Heading>
           <Text fontSize={16} my={4} textAlign="center" fontFamily="Inter">
-            May challenge awaits! Will you take part and guide your team to
-            glory?
+            Will you take part and guide your team to glory?
           </Text>
           <Image
             source={require("../assets/images/trophy.png")}
@@ -93,9 +123,8 @@ const CompetitionScreen: FC<CompetitionProp> = ({ navigation }) => {
             _text={{ color: "white" }}
             onPress={() => setModal(true)}
           >
-            Entry is 5000 Dunks
+            Entry is 5,000 Dunks
           </Button>
-         
         </VStack>
       </Pressable>
     </Box>

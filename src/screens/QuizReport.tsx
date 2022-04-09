@@ -10,7 +10,8 @@ interface QuizReportProps {
 }
 
 const QuizReport: FC<QuizReportProps> = ({ navigation, route }) => {
-  const { correct, wrong, dunkEarned } = route.params;
+  const { correct, wrong, dunkEarned, length } = route.params;
+  const pointPercentage = Math.ceil(correct / length) * 100;
 
   const { userRole } = useUser();
 
@@ -36,7 +37,7 @@ const QuizReport: FC<QuizReportProps> = ({ navigation, route }) => {
       <Text fontWeight="bold" fontSize={18} my={4}>
         <Icon as={<Foundation name="star" />} size={6} color="yellow.500" />
         {"  "}
-        98%
+        {pointPercentage}%
       </Text>
       <VStack w="100%" mb={4} pl={1}>
         <HStack justifyContent="space-between" my={1}>
@@ -44,7 +45,13 @@ const QuizReport: FC<QuizReportProps> = ({ navigation, route }) => {
             Remark
           </Text>
           <Text textAlign="left" w="100px" fontWeight="bold" color="yellow.500">
-            Excellent
+            {pointPercentage < 40
+              ? "Fair"
+              : pointPercentage >= 40 && pointPercentage <= 60
+              ? "Good"
+              : pointPercentage > 61
+              ? "Excellent"
+              : null}
           </Text>
         </HStack>
         <HStack justifyContent="space-between" my={1}>
@@ -52,7 +59,7 @@ const QuizReport: FC<QuizReportProps> = ({ navigation, route }) => {
             Correct Answers
           </Text>
           <Text textAlign="left" w="100px" fontWeight="bold">
-            29
+            {correct}
           </Text>
         </HStack>
         <HStack justifyContent="space-between">
@@ -60,7 +67,7 @@ const QuizReport: FC<QuizReportProps> = ({ navigation, route }) => {
             Wrong Answers
           </Text>
           <Text textAlign="left" my={1} w="100px" fontWeight="bold">
-            1
+            {length - correct}
           </Text>
         </HStack>
         <HStack justifyContent="space-between" my={1}>
@@ -68,7 +75,7 @@ const QuizReport: FC<QuizReportProps> = ({ navigation, route }) => {
             Dunks Earned
           </Text>
           <Text textAlign="left" w="100px" fontWeight="bold">
-            1000
+            {correct * dunkEarned}
           </Text>
         </HStack>
       </VStack>

@@ -43,10 +43,9 @@ function Component(props: any) {
 }
 
 function CustomDrawerContent(props: any) {
-  const { isLoading, signOut } = useUser();
+  const { signOut } = useUser();
   const exit = async () => {
-    await signOut();
-    if (!isLoading) props.navigation.navigate("onboardingScreen");
+    signOut().then(() => props.navigation.navigate("onboardingScreen"));
   };
   return (
     <DrawerContentScrollView
@@ -78,7 +77,6 @@ function CustomDrawerContent(props: any) {
 }
 
 function HomeComponent(role: any) {
-
   switch (role) {
     case "student":
       return StudentTap;
